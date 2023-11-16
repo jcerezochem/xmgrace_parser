@@ -852,7 +852,7 @@ class AgrFile():
             xmgrace will replace the current data.
         """
         assert self.xmgrace is not None, "xmgrace executable not found"
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(str(self))
             tmpfile.flush()
@@ -925,7 +925,7 @@ class AgrFile():
         if device not in self.devices():
             raise ValueError("Unknown device %s. Availables devices are: %s"
                              % (device, ", ".join(self.devices())))
-        with tempfile.NamedTemporaryFile(suffix=".cmd", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".cmd", delete=False) \
         as batchfile:
             if write_batch is not None:
                 command = [self.gracebat, '-hardcopy', '-nosafe',
@@ -942,7 +942,7 @@ class AgrFile():
                 else:
                     batchfile.write("DEVICE \"%s\" OP \"%s:%s\"\n"
                                     % (device, key, kwargs[key]))
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(str(self))
             tmpfile.flush()
@@ -969,7 +969,7 @@ class AgrFile():
 
     def edit_header(self):
         """ Load header_lines in EDITOR for editing"""
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(self.header_lines))
             tmpfile.flush()
@@ -987,7 +987,7 @@ class AgrFile():
     def edit_drawing_objects(self):
         """ Load all drawing object in EDITOR for editing """
         lines_to_edit = list(map(str, self.drawing_objects))
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(lines_to_edit))
             tmpfile.flush()
@@ -1006,7 +1006,7 @@ class AgrFile():
         lines.extend(list(map(str, self.regions)))
         lines.extend(list(map(str, self.graphs)))
         lines.extend(list(map(str, self.datasets)))
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(lines))
         self.parse(tmpfile.name)
@@ -1025,7 +1025,7 @@ class AgrFile():
         if with_sets:
             lines_to_edit = self.graphs[g].lines
             lines_to_edit.extend(list(map(str, self.graphs[g].sets)))
-            with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
             as tmpfile:
                 tmpfile.write(''.join(lines_to_edit))
                 tmpfile.flush()
@@ -1048,7 +1048,7 @@ class AgrFile():
                 else:
                     lines.append(str(graph))
             lines.extend(list(map(str, self.datasets)))
-            with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
             as tmpfile:
                 tmpfile.write(''.join(lines))
             self.parse(tmpfile.name)
@@ -1275,7 +1275,7 @@ class AgrDrawingObject():
 
     def edit_lines(self):
         """ Load lines in EDITOR for editing"""
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(self.lines))
             tmpfile.flush()
@@ -1323,7 +1323,7 @@ class AgrRegion():
 
     def edit_lines(self):
         """ Load lines in EDITOR for editing"""
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(self.lines))
             tmpfile.flush()
@@ -1441,7 +1441,7 @@ class AgrGraph():
         """ Load lines in EDITOR for editing (remember that the lines to not
             include any of the sets; just the general graph properties)
         """
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(self.lines))
             tmpfile.flush()
@@ -1650,7 +1650,7 @@ class AgrSet():
 
     def edit_lines(self):
         """ Load lines in EDITOR for editing """
-        with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(self.lines))
             tmpfile.flush()
@@ -1856,7 +1856,7 @@ class AgrDataSet():
 
     def edit_data(self):
         """ Load data lines in EDITOR for editing"""
-        with tempfile.NamedTemporaryFile(suffix=".tmp", delete=False) \
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".tmp", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(self.lines[2:-1]))
             tmpfile.flush()
@@ -2315,7 +2315,7 @@ def temp_file_name(suffix):
     """
     if not suffix.startswith('.'):
         suffix = '.' + suffix
-    fh = tempfile.NamedTemporaryFile(suffix=suffix, delete=True)
+    fh = tempfile.NamedTemporaryFile(smode="w", uffix=suffix, delete=True)
     filename = fh.name
     fh.close()
     return filename

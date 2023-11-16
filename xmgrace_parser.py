@@ -122,7 +122,7 @@ __version__ = '1.0.1'
 
 import re
 import logging
-from StringIO import StringIO
+from io import StringIO
 import sys, tempfile, os
 import subprocess
 from subprocess import call, check_output
@@ -236,12 +236,12 @@ class AgrFile():
         if XMGRACE is None:
             self.xmgrace = which('xmgrace')
         if self.xmgrace is None:
-            print >> sys.stdout, "WARNING: xmgrace not availabe"
+            print("WARNING: xmgrace not availabe", file=sys.stdout)
         self.gracebate = GRACEBAT
         if GRACEBAT is None:
             self.gracebat = which('gracebat')
         if self.gracebat is None:
-            print >> sys.stdout, "WARNING: gracebat not availabe"
+            print("WARNING: gracebat not availabe", file=sys.stdout)
 
         self.parse(agr_file, repair)
 
@@ -257,10 +257,10 @@ class AgrFile():
         """ Return the entire agr file as a string """
         lines = []
         lines.extend(self.header_lines)
-        lines.extend(map(str, self.drawing_objects))
-        lines.extend(map(str, self.regions))
-        lines.extend(map(str, self.graphs))
-        lines.extend(map(str, self.datasets))
+        lines.extend(list(map(str, self.drawing_objects)))
+        lines.extend(list(map(str, self.regions)))
+        lines.extend(list(map(str, self.graphs)))
+        lines.extend(list(map(str, self.datasets)))
         return ''.join(lines)
 
     def _repr_png_(self):
@@ -317,14 +317,14 @@ class AgrFile():
         """
         if unit == 'DEFAULT_UNIT': unit = DEFAULT_UNIT
         x_min, y_min, x_max, y_max = self.get_graph_view(g, unit)
-        print "x_min : %f %s" % (x_min, unit)
-        print "y_min : %f %s" % (y_min, unit)
-        print "x_max : %f %s" % (x_max, unit)
-        print "y_max : %f %s" % (y_max, unit)
+        print("x_min : %f %s" % (x_min, unit))
+        print("y_min : %f %s" % (y_min, unit))
+        print("x_max : %f %s" % (x_max, unit))
+        print("y_max : %f %s" % (y_max, unit))
         width = x_max - x_min
         height = y_max - y_min
-        print "width : %f %s" % (width, unit)
-        print "height: %f %s" % (height, unit)
+        print("width : %f %s" % (width, unit))
+        print("height: %f %s" % (height, unit))
 
     def set_graph_view(self, g, x_min=None, y_min=None, x_max=None, y_max=None,
     width=None, height=None, unit='DEFAULT_UNIT', move_legend=True,
@@ -386,23 +386,23 @@ class AgrFile():
             old_x_max_u = self.conv_coord(old_x_max, 'viewport', DEFAULT_UNIT)
             old_y_min_u = self.conv_coord(old_y_min, 'viewport', DEFAULT_UNIT)
             old_y_max_u = self.conv_coord(old_y_max, 'viewport', DEFAULT_UNIT)
-            print 'Moved graph to new viewpoint'
-            print "x_min : %.2f -> %.2f %s" \
-                  % (old_x_min_u, x_min_u, DEFAULT_UNIT)
-            print "y_min : %.2f -> %.2f %s" \
-                  % (old_y_min_u, y_min_u, DEFAULT_UNIT)
-            print "x_max : %.2f -> %.2f %s" \
-                  % (old_x_max_u, x_max_u, DEFAULT_UNIT)
-            print "y_max : %.2f -> %.2f %s" \
-                  % (old_y_max_u, y_max_u, DEFAULT_UNIT)
+            print('Moved graph to new viewpoint')
+            print("x_min : %.2f -> %.2f %s" \
+                  % (old_x_min_u, x_min_u, DEFAULT_UNIT))
+            print("y_min : %.2f -> %.2f %s" \
+                  % (old_y_min_u, y_min_u, DEFAULT_UNIT))
+            print("x_max : %.2f -> %.2f %s" \
+                  % (old_x_max_u, x_max_u, DEFAULT_UNIT))
+            print("y_max : %.2f -> %.2f %s" \
+                  % (old_y_max_u, y_max_u, DEFAULT_UNIT))
             width  = x_max - x_min
             height = y_max - y_min
             old_width  = old_x_max - old_x_min
             old_height = old_y_max - old_y_min
-            print "width : %.2f -> %.2f %s" \
-                  % (old_width, width, DEFAULT_UNIT)
-            print "height: %.2f -> %.2f %s" \
-                  % (old_height, height, DEFAULT_UNIT)
+            print("width : %.2f -> %.2f %s" \
+                  % (old_width, width, DEFAULT_UNIT))
+            print("height: %.2f -> %.2f %s" \
+                  % (old_height, height, DEFAULT_UNIT))
         # Move legend (if activated)
         if move_legend and old_legend_loctype.strip() == 'view':
             x_offset = x_min - old_x_min
@@ -413,10 +413,10 @@ class AgrFile():
             legend_y = old_legend_y + y_offset
             self.graphs[g]['legend'] = "%f, %f" % (legend_x, legend_y)
             if not silent:
-                print "Moved legend by offset %f, %f (%s)" \
+                print("Moved legend by offset %f, %f (%s)" \
                 % (self.conv_coord(x_offset, 'viewport', DEFAULT_UNIT),
                    self.conv_coord(y_offset, 'viewport', DEFAULT_UNIT),
-                   DEFAULT_UNIT)
+                   DEFAULT_UNIT))
 
     def conv_coord(self, val, from_unit=DEFAULT_UNIT, to_unit='viewport'):
         """ Convert between absolute and relative (viewport) coordiantes
@@ -516,45 +516,45 @@ class AgrFile():
             file
         """
         canvas_width, canvas_height = self.get_size()
-        print "Canvas size: %.2f x %.2f %s" \
-        % (canvas_width, canvas_height, DEFAULT_UNIT)
+        print("Canvas size: %.2f x %.2f %s" \
+        % (canvas_width, canvas_height, DEFAULT_UNIT))
         self.check_consistency()
         n_drawing_objects = len(self.drawing_objects)
         if n_drawing_objects == 1:
-            print "There is %d drawing object in the plot" % n_drawing_objects
+            print("There is %d drawing object in the plot" % n_drawing_objects)
         else:
-            print "There are %d drawing objects in the plot" \
-            % n_drawing_objects
+            print("There are %d drawing objects in the plot" \
+            % n_drawing_objects)
         n_regions = len(self.regions)
         if n_regions == 1:
-            print "There is %d region in the plot" % n_regions
+            print("There is %d region in the plot" % n_regions)
         else:
-            print "There are %d regions in the plot" % n_regions
+            print("There are %d regions in the plot" % n_regions)
         n_graphs = len(self.graphs)
         if n_graphs == 1:
-            print "There is %d graph in the plot" % n_graphs
+            print("There is %d graph in the plot" % n_graphs)
         else:
-            print "There are %d graphs in the plot" % n_graphs
+            print("There are %d graphs in the plot" % n_graphs)
         for i, graph in enumerate(self.graphs):
             x_min, y_min, x_max, y_max = self.get_graph_view(i)
             width = x_max - x_min
             height = y_max - y_min
             n_sets = len(graph.sets)
             if n_sets == 1:
-                print "Graph %d [size %.2f x %.2f %s at (%.2f, %f.2) %s]" \
-                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT)
+                print("Graph %d [size %.2f x %.2f %s at (%.2f, %f.2) %s]" \
+                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT))
             else:
-                print "Graph %d [size %.2f x %.2f %s at (%.2f, %.2f) %s]" \
-                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT)
+                print("Graph %d [size %.2f x %.2f %s at (%.2f, %.2f) %s]" \
+                % (i, width, height, DEFAULT_UNIT, x_min, y_min, DEFAULT_UNIT))
             for j, set in enumerate(graph.sets):
-                print "    Set G%dS%d (%s): %d data points" \
-                % (i, j, set._get_type(), self.get_dataset(i,j).get_n_rows())
+                print("    Set G%dS%d (%s): %d data points" \
+                % (i, j, set._get_type(), self.get_dataset(i,j).get_n_rows()))
                 comment = set._get_comment()
                 if comment is not None and comment != "":
-                    print "        comment: %s" % comment
+                    print("        comment: %s" % comment)
                 legend = set._get_legend()
                 if legend is not None and legend != "":
-                    print "        legend : %s" % legend
+                    print("        legend : %s" % legend)
 
     def get_set(self, g, s):
         """ Return the AgrSet instance that matches the given graph and set
@@ -581,7 +581,7 @@ class AgrFile():
         """
         labels = []
         for g, graph in enumerate(self.graphs):
-            for s in xrange(len(graph.sets)):
+            for s in range(len(graph.sets)):
                 label = "G%dS%d" % (g, s)
                 labels.append(label)
         return labels
@@ -666,7 +666,7 @@ class AgrFile():
         # build new_order array for datasets
         dataset_new_order = []
         j = 0
-        for i in xrange(len(self.datasets)):
+        for i in range(len(self.datasets)):
             dataset_new_order.append(i)
             if i >= offset:
                 if j < len(new_order):
@@ -919,9 +919,9 @@ class AgrFile():
                 pdf_filename = filename
                 filename = "%s.%s" % (basename, 'eps')
                 if not quiet:
-                    print >> sys.stdout, "WARNING: xmgrace is installed " \
+                    print("WARNING: xmgrace is installed " \
                         "without the PDF terminal. Will use epstopdf to " \
-                        "generate pdf."
+                        "generate pdf.", file=sys.stdout)
         if device not in self.devices():
             raise ValueError("Unknown device %s. Availables devices are: %s"
                              % (device, ", ".join(self.devices())))
@@ -950,10 +950,10 @@ class AgrFile():
                        '-hdevice', device, '-printfile', filename,
                        '-batch', batchfile.name, tmpfile.name]
             if not quiet:
-                print " ".join(command)
+                print(" ".join(command))
             call(command)
             if not quiet:
-                print "Written hardcopy to %s" % filename
+                print("Written hardcopy to %s" % filename)
         if write_batch is not None:
             shutil.copy(batchfile.name, write_batch)
         os.unlink(batchfile.name)
@@ -963,7 +963,7 @@ class AgrFile():
             # terminal was available. Must convert filename -> pdf_filename.
             command = [epstopdf, '--outfile=%s' % pdf_filename, filename]
             if not quiet:
-                print " ".join(command)
+                print(" ".join(command))
             call(command)
             os.unlink(filename)
 
@@ -986,7 +986,7 @@ class AgrFile():
 
     def edit_drawing_objects(self):
         """ Load all drawing object in EDITOR for editing """
-        lines_to_edit = map(str, self.drawing_objects)
+        lines_to_edit = list(map(str, self.drawing_objects))
         with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(lines_to_edit))
@@ -1003,9 +1003,9 @@ class AgrFile():
         lines = []
         lines.extend(self.header_lines)
         lines.extend(edited_lines)
-        lines.extend(map(str, self.regions))
-        lines.extend(map(str, self.graphs))
-        lines.extend(map(str, self.datasets))
+        lines.extend(list(map(str, self.regions)))
+        lines.extend(list(map(str, self.graphs)))
+        lines.extend(list(map(str, self.datasets)))
         with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
         as tmpfile:
             tmpfile.write(''.join(lines))
@@ -1024,7 +1024,7 @@ class AgrFile():
         """
         if with_sets:
             lines_to_edit = self.graphs[g].lines
-            lines_to_edit.extend(map(str, self.graphs[g].sets))
+            lines_to_edit.extend(list(map(str, self.graphs[g].sets)))
             with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
             as tmpfile:
                 tmpfile.write(''.join(lines_to_edit))
@@ -1040,14 +1040,14 @@ class AgrFile():
             filename = self.filename
             lines = []
             lines.extend(self.header_lines)
-            lines.extend(map(str, self.drawing_objects))
-            lines.extend(map(str, self.regions))
+            lines.extend(list(map(str, self.drawing_objects)))
+            lines.extend(list(map(str, self.regions)))
             for i, graph in enumerate(self.graphs):
                 if i == g:
                     lines.extend(edited_lines)
                 else:
                     lines.append(str(graph))
-            lines.extend(map(str, self.datasets))
+            lines.extend(list(map(str, self.datasets)))
             with tempfile.NamedTemporaryFile(suffix=".agr", delete=False) \
             as tmpfile:
                 tmpfile.write(''.join(lines))
@@ -1188,7 +1188,7 @@ class AgrFile():
             if os.path.exists(out_file):
                 msg = "%s exists. Do you want to overwrite? yes/[no]: " \
                       % out_file
-                answer = raw_input(msg)
+                answer = input(msg)
                 if answer == "yes":
                     overwrite = True
             else:
@@ -1200,9 +1200,9 @@ class AgrFile():
         if overwrite:
             with open(out_file, 'w') as fh:
                 fh.write(str(self))
-            print "Written to %s" % out_file
+            print("Written to %s" % out_file)
         else:
-            print "Nothing written"
+            print("Nothing written")
 
     def scale_font(self, factor):
         """ Scale all font sizes by the given factor """
@@ -1423,7 +1423,7 @@ class AgrGraph():
         """
         lines = []
         lines.extend(self.lines)
-        lines.extend(map(str, self.sets))
+        lines.extend(list(map(str, self.sets)))
         return ''.join(lines)
 
     def _linelog(self, attr, sub_attr=None):
@@ -1902,16 +1902,14 @@ class AgrDataSet():
 
     def set_type(self, type, check_columns=True):
         """ Set the type (xy, xydx, ...) for the data set """
-        if type in self._set_types.keys():
+        if type in list(self._set_types.keys()):
             self.lines[1] = "@type %s\n" % type
         else:
             raise ValueError("Unknown dataset type %s" % type)
         if check_columns:
             n_columns = len(self.lines[2].split())
             if self._set_types[type] != n_columns:
-                raise(AgrInconsistencyError(
-                "%s type implies %d columns, but %d columns are present"
-                % (type, self._set_types[type], n_columns)))
+                raise AgrInconsistencyError
 
     def set_data(self, *numpy_arrays, **kwargs):
         """ Set the data from the data set from the given numpy arrays
@@ -1929,9 +1927,9 @@ class AgrDataSet():
         write_buffer.write(self.lines[0])
         write_buffer.write(self.lines[1])
         if 'fmt' in kwargs:
-            np.savetxt(write_buffer, zip(*numpy_arrays), fmt=kwargs['fmt'])
+            np.savetxt(write_buffer, list(zip(*numpy_arrays)), fmt=kwargs['fmt'])
         else:
-            np.savetxt(write_buffer, zip(*numpy_arrays), fmt='%10g')
+            np.savetxt(write_buffer, list(zip(*numpy_arrays)), fmt='%10g')
         write_buffer.write(self.lines[-1])
         read_buffer = StringIO(write_buffer.getvalue())
         write_buffer.close()
@@ -1967,7 +1965,7 @@ def _update_properties_in_lines(lines, regexes, **kwargs):
     # check regexes: must contain the necessary groups
     for regex in regexes:
         for group in ['pre', 'kwd', 'sep', 'val']:
-            if not group in regex.groupindex.keys():
+            if not group in list(regex.groupindex.keys()):
                 raise ValueError("regex \n%s\n' "% regex.pattern
                 +"does not define groups 'pre', 'kwd', 'sep', 'val'")
     kwd_count = {} # dictionary for counting keyword uses
@@ -2014,8 +2012,8 @@ def _update_properties_in_lines(lines, regexes, **kwargs):
                 break # go to next line
         if not matched:
             logging.debug("No regex matched line %d", i)
-    if len(kwargs.keys()) > 0:
-        raise TypeError("Unexpected keyword arguments: %s" % kwargs.keys())
+    if len(list(kwargs.keys())) > 0:
+        raise TypeError("Unexpected keyword arguments: %s" % list(kwargs.keys()))
 
 
 def _get_properties_in_lines(lines, regexes, properties):
@@ -2042,7 +2040,7 @@ def _get_properties_in_lines(lines, regexes, properties):
     # check regexes: must contain the necessary groups
     for regex in regexes:
         for group in ['pre', 'kwd', 'sep', 'val']:
-            if not group in regex.groupindex.keys():
+            if not group in list(regex.groupindex.keys()):
                 raise ValueError("regex \n%s\n' "% regex.pattern
                 +"does not define groups 'pre', 'kwd', 'sep', 'val'")
     kwd_count = {} # dictionary for counting keyword uses
@@ -2114,7 +2112,7 @@ def _keys_in_lines(lines, regexes):
     # check regexes: must contain the necessary groups
     for regex in regexes:
         for group in ['pre', 'kwd', 'sep', 'val']:
-            if not group in regex.groupindex.keys():
+            if not group in list(regex.groupindex.keys()):
                 raise ValueError("regex \n%s\n' "% regex.pattern
                 +"does not define groups 'pre', 'kwd', 'sep', 'val'")
     kwd_count = {} # dictionary for counting keyword uses
@@ -2180,7 +2178,7 @@ def which(name):
     # adapted from a routine that is part of the Twisted framework
     # (http://twistedmatrix.com)
     flags = os.X_OK # On Windows, only flag that has any meaning is os.F_OK.
-    exts = filter(None, os.environ.get('PATHEXT', '').split(os.pathsep))
+    exts = [_f for _f in os.environ.get('PATHEXT', '').split(os.pathsep) if _f]
     path = os.environ.get('PATH', None)
     if path is None:
         return None
@@ -2252,7 +2250,7 @@ def tex2grace(string, print_string=True):
     for mapping in mappings:
         string = re.sub(mapping[0], mapping[1], string)
     if print_string:
-        print string
+        print(string)
     else:
         return string
 
@@ -2306,7 +2304,7 @@ def grace2tex(string, print_string=True):
     for mapping in mappings:
         string = re.sub(mapping[0], mapping[1], string)
     if print_string:
-        print string
+        print(string)
     else:
         return string
 
